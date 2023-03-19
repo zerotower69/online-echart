@@ -2,7 +2,7 @@
  * @Author: zerotower69 zerotower@163.com
  * @Date: 2023-03-16 22:51:57
  * @LastEditors: zerotower69 zerotower@163.com
- * @LastEditTime: 2023-03-19 21:21:13
+ * @LastEditTime: 2023-03-19 22:18:46
  * @FilePath: /online/src/components/Chart.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -12,14 +12,10 @@
 </template>
 
 <script setup lang="ts">
-import * as echarts from "echarts";
-import { EChartsOption, ECharts } from "echarts";
 import { onMounted, ref, watch } from "vue";
 
 interface ChartProps {
-    options: EChartsOption;
     autoRender: boolean;
-    code: String;
     data: {
         title: string;
         codeStr: string;
@@ -29,8 +25,6 @@ const props = defineProps<ChartProps>();
 
 const chartRef = ref();
 const frameRef = ref<HTMLIFrameElement>();
-
-let chart: ECharts;
 
 const docStr = ref("");
 const subIsLoaded = ref(false);
@@ -63,12 +57,13 @@ function initWindow() {
 //设置代码
 function setScript(dm: Document, id: string, win?: Window,theme?:string) {
     if (subIsLoaded.value) {
-        debugger;
         //移除原来的,记得销毁实例防止内存溢出
         const oldScript = dm.getElementById(id);
         if (oldScript?.remove) {
+            //@ts-ignore
             if (win?.myChart?.dispose) {
-                win.myChart.dispose()
+                //@ts-ignore
+                win?.myChart?.dispose()
             }
             oldScript.remove();
         }
@@ -107,7 +102,8 @@ function setCode(theme?: string) {
 // get chart base64 image data, then transform it to object url
 function getImage() {
     try {
-        const base64 = win.myChart.getDataURL();
+        //@ts-ignore
+        const base64 = win?.myChart?.getDataURL();
     // const img = new Image();
     // img.src = base64;
     let parts = base64.split(';base64,')
