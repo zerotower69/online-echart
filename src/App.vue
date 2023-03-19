@@ -2,7 +2,7 @@
  * @Author: zerotower69 zerotower@163.com
  * @Date: 2023-03-16 20:37:26
  * @LastEditors: zerotower69 zerotower@163.com
- * @LastEditTime: 2023-03-19 23:05:20
+ * @LastEditTime: 2023-03-19 23:16:24
  * @FilePath: /online/src/App.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -101,6 +101,7 @@ function toFriend(event: Event) {
 
 //init page if code=xxx in the url,load it!
 function initPage() {
+  // this is a simple project, don't need to use vue-router!
   const suffix = window.location.search;
   if (!suffix) return;
   const list = suffix.substring(1).split('&');
@@ -110,6 +111,7 @@ function initPage() {
     map[key] = val;
   })
   if (map['code']) {
+    // get the code from user gived
     scritStr.value = Base64.decode(map['code']);
     ElMessage.warning('该图表由用户数据自行生成，请注意辨别!')
   }
