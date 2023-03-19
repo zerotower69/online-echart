@@ -2,7 +2,7 @@
  * @Author: zerotower69 zerotower@163.com
  * @Date: 2023-03-16 22:51:57
  * @LastEditors: zerotower69 zerotower@163.com
- * @LastEditTime: 2023-03-19 22:18:46
+ * @LastEditTime: 2023-03-19 23:31:30
  * @FilePath: /online/src/components/Chart.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -50,12 +50,12 @@ function initWindow() {
         subIsLoaded.value = true;
         doc = e.target as Document;
         //加载后设置代码
-        setScript(e.target as Document, 'chart-code', win as Window,'light');
+        setScript(e.target as Document, 'chart-code', win as Window, 'light');
 
     }
 }
 //设置代码
-function setScript(dm: Document, id: string, win?: Window,theme?:string) {
+function setScript(dm: Document, id: string, win?: Window, theme?: string) {
     if (subIsLoaded.value) {
         //移除原来的,记得销毁实例防止内存溢出
         const oldScript = dm.getElementById(id);
@@ -67,6 +67,7 @@ function setScript(dm: Document, id: string, win?: Window,theme?:string) {
             }
             oldScript.remove();
         }
+        // 下方的自执行函数为了防止声明的变量污染全局
         const rawCode = `
      var dom = document.getElementById("container");
       var myChart = echarts.init(dom, "${theme}", {
@@ -77,7 +78,9 @@ function setScript(dm: Document, id: string, win?: Window,theme?:string) {
 
       var option;
 
-      ${props.data.codeStr}
+      (function(){
+        ${props.data.codeStr}
+      })()
 
        if (option && typeof option === "object") {
         myChart.setOption(option);
@@ -96,27 +99,27 @@ function setScript(dm: Document, id: string, win?: Window,theme?:string) {
 
 //外部调用设置代码
 function setCode(theme?: string) {
-     theme = theme ? theme : 'light';
-    setScript(doc as Document, 'chart-code', win as Window,theme);
+    theme = theme ? theme : 'light';
+    setScript(doc as Document, 'chart-code', win as Window, theme);
 }
 // get chart base64 image data, then transform it to object url
 function getImage() {
     try {
         //@ts-ignore
         const base64 = win?.myChart?.getDataURL();
-    // const img = new Image();
-    // img.src = base64;
-    let parts = base64.split(';base64,')
-    let contentType = parts[0].split(':')[1]
-    let raw = window.atob(parts[1]) // 解码base64得到二进制字符串
-    let rawLength = raw.length
-    let uInt8Array = new Uint8Array(rawLength) // 创建8位无符号整数值的类型化数组
-    for (let i = 0; i < rawLength; ++i) {
-        uInt8Array[i] = raw.charCodeAt(i) // 数组接收二进制字符串
-    }
-    const blob = new Blob([uInt8Array], { type: contentType });
+        // const img = new Image();
+        // img.src = base64;
+        let parts = base64.split(';base64,')
+        let contentType = parts[0].split(':')[1]
+        let raw = window.atob(parts[1]) // 解码base64得到二进制字符串
+        let rawLength = raw.length
+        let uInt8Array = new Uint8Array(rawLength) // 创建8位无符号整数值的类型化数组
+        for (let i = 0; i < rawLength; ++i) {
+            uInt8Array[i] = raw.charCodeAt(i) // 数组接收二进制字符串
+        }
+        const blob = new Blob([uInt8Array], { type: contentType });
         const url = URL.createObjectURL(blob);
-    return Promise.resolve(url)
+        return Promise.resolve(url)
     }
     catch (err) {
         return Promise.reject(err);
